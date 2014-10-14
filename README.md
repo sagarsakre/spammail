@@ -6,6 +6,10 @@ This project contains a small shell script which sends the mail to a recipient
 I have written a small shell script which will spam a mail id.
 I have used a incremental variable in Subject line since google clubs mails if subject line is same
 
+Prerequisite:
+You need to setup mailx on your linux machine to enable sending mails via terminal
+Follow instructions in gmail-setup.txt or check http://sagarsakre.blogspot.in/2012/09/sending-emails-from-terminal-using.html
+
 Background:
 Inspired from a quora answer I decided to write this script.
 
