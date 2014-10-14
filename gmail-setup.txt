@@ -1,0 +1,140 @@
+Sending Emails From Terminal Using Gmail Account
+
+Linux terminal is one of the coolest tools I’ve ever come across. 
+If you are also a fan of the terminal, and are a Gmail user, you should like this article.
+
+Note: I’ve tested these steps on linux mint 12
+
+
+-------------------------------------------------------------------------------------------------
+Security certificate
+-------------------------------------------------------------------------------------------------
+
+Before proceeding, we need Gmail’s security certificate on our system. 
+Why? Gmail sends encrypted data over SSL (Secure Sockets Layer) for security; 
+this certificate is necessary for encryption of data.
+
+Ideally, you should have the file Equifax_Secure_CA.crt under /usr/share/ca-certificates/mozilla/. 
+If you do, you’re ready to move on. If you don’t have it, 
+steps 6 & 7 at http://www.chrisstreeter.com/archive/2009/04/305/gmail-imap-backup-with-mbsync-on-ubuntu may help you. 
+Set the tls_trust_file parameter (in msmtp configuration, described below) to the path of the certificate file.
+
+-------------------------------------------------------------------------------------------------
+Installation
+-------------------------------------------------------------------------------------------------
+
+We need to install two packages–msmtp (a simple and easy-to-use SMTP client), 
+and mailx (a utility program to send and receive emails). 
+In a terminal, run the appropriate command for your distro; 
+for systems supporting deb packages (e.g. Debian, Ubuntu, LinuxMint etc.), use 
+
+sudo apt-get install msmtp
+
+sudo apt-get install heirloom-mailx 
+
+for systems supporting RPM packages (e.g. RedHat, Fedora etc.), use sudo yum install msmtp mailx.
+
+-------------------------------------------------------------------------------------------------
+Configuring msmtp
+--------------------------------------------------------------------------------------------------
+We need to create an msmtp configuration file—create a file named .msmtprc in your home directory, and open it in your favourite editor. Copy the following code and paste it in the file.
+
+ 
+#Configuration starts
+# Gmail account starts
+
+# account name which must be unique for each account
+
+account gmail1
+
+auth on
+
+#Gmail SMTP host name
+
+host smtp.gmail.com
+
+port 587
+
+#sets Transport Layer Security on
+
+tls on
+
+# location of tls certificate file for Gmail (change this parameter if your certificate file is stored at some other location in your File-system)
+
+tls_trust_file /usr/share/ca-certificates/mozilla/Equifax_Secure_CA.crt
+
+#your email id here (e.g. abc@gmail.com)
+
+user YOUR_EMAIL_ID
+
+#your password here
+
+password YOUR_PASSWORD
+
+#email id of the sender that is you again
+
+from YOUR_EMAIL_ID
+
+# Gmail account end
+
+#So we have added one account. Similarly we can add more accounts by repeating and modifying above code for each new account. Make sure you give unique name to each account.
+
+#set default account to be used when no account is specified (Not necessary for single account)
+
+account default: gmail1
+
+#Configuration ends
+ 
+
+Don’t forget to replace the capitalised words with values specific to your account. Save and close the file. To get msmtp to work properly, we need to set proper permissions on this file, with the command chmod 600 ~/.msmtprc in the terminal. This makes the file’s contents viewable by only your account and root.
+
+-------------------------------------------------------------------------------------------------
+Configuring mailx
+-------------------------------------------------------------------------------------------------
+
+To configure mailx, we need to create another configuration file, ~/.mailrc. The following code goes in that file:
+
+#Configuration starts
+set from="YOUR_EMAIL_ID"                    #your email id here
+
+set sendmail="/usr/bin/msmtp"       #location of msmtp's binary executable
+
+set message-sendmail-extra-arguments="-a gmail1" #additional arguments to msmtp goes here (optional) (-a indicates account name to be used to send mails)
+
+#Configuration ends
+
+
+Again replace capitalised words with values specific to your account. Save and close .mailrc. Now you are all set to send your first mail from the terminal.
+
+Note: The .msmtprc and .mailrc files in the user’s home directory means they are user configuration files. Each user of the system who wants to send emails from the terminal will have to create his/her own configuration files in his home directory. The same files can be created as system configuration files, in the /etc directory, if all users on the system are sharing one Gmail account. I would personally prefer user configuration files, because I want to keep my personal Gmail login information confidential.
+
+-------------------------------------------------------------------------------------------------
+Sending your first email
+-------------------------------------------------------------------------------------------------
+
+To send your first mail, run mailx RECIPIENT_EMAIL_ID (here, replace RECIPIENT_EMAIL_IDwith the actual email address to send your mail (e.g. xyz@gmail.com). You will be prompted to enter Subject and Body of the mail. Once you’re done typing the body of the message, pressEnter and Ctrl+D to send the mail. If you don’t receive any error message on terminal then your mail is sent successfully.
+
+
+-------------------------------------------------------------------------------------------------
+Useful mailx arguments
+-------------------------------------------------------------------------------------------------
+
+Here are some command-line switches to mailx that you may find useful.
+
+-s: Specify a subject (e.g. mailx -s “subject line” RECIPIENT_EMAIL_ID)
+
+-a: Add an attachments (e.g. mailx -a PATH RECIPIENT_EMAIL_ID) (Replace PATH with the full path to the file you want to attach.)
+
+You can explore more arguments in the mailx manual page (run man mailx).
+
+One more trick: you can redirect the contents of a file as the body of the mail with:
+
+mailx -s "subject line" RECIPIENT_EMAIL_ID < /path/body.txt
+
+-------------------------------------------------------------------------------------------------
+Rolling back
+-------------------------------------------------------------------------------------------------
+
+If you want to undo the above experimentation, delete the configuration files (rm ~/.mailrc ~/.msmtprc) and remove the packages with the appropriate command for your system—for systems supporting DEB packages, sudo apt-get remove msmtp heirloom-mailx and for systems supporting RPM packages,
+
+sudo apt-get remove msmtp mailx
