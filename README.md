@@ -10,6 +10,9 @@ Prerequisite:
 You need to setup mailx on your linux machine to enable sending mails via terminal
 Follow instructions in gmail-setup.txt or check http://sagarsakre.blogspot.in/2012/09/sending-emails-from-terminal-using.html
 
+Update:
+I have updated the repo with the screenshots. Observe the timings.
+
 Background:
 Inspired from a quora answer I decided to write this script.
 
